@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Standardization and the Redefinition of "Good"</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#241f1a;
+    --bone:#ece5d6;
+    --bone-soft:#e2d9c4;
+    --indigo:#1c2b3a;
+    --indigo-deep:#131e29;
+    --oxblood:#7d1f2c;
+    --oxblood-bright:#a3293a;
+    --celadon:#6f9384;
+    --celadon-soft:#8fab9d;
+    --stone:#87806f;
+    --line:#cfc4a8;
+    --line-dark:#33465a;
+    --serif:'Newsreader', Georgia, serif;
+    --sans:'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+    --mono:'IBM Plex Mono', ui-monospace, monospace;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    *{animation-duration:0.01ms !important; transition-duration:0.01ms !important;}
+  }
+  body{
+    font-family:var(--sans);
+    background:var(--bone);
+    color:var(--ink);
+    line-height:1.5;
+    overflow-x:hidden;
+  }
+  ::selection{background:var(--oxblood); color:var(--bone);}
+  a{color:inherit;}
+  :focus-visible{outline:2px solid var(--oxblood); outline-offset:3px;}
+
+  .wrap{max-width:1180px; margin:0 auto; padding:0 48px;}
+  @media (max-width:720px){ .wrap{padding:0 24px;} }
+
+  section{padding:140px 0; position:relative;}
+  @media (max-width:720px){ section{padding:88px 0;} }
+
+  .kicker{
+    font-family:var(--mono);
+    font-size:14px;
+    color:var(--oxblood);
+    display:flex; align-items:center; gap:10px;
+    margin-bottom:28px;
+  }
+  .kicker::before{content:""; width:28px; height:1px; background:var(--oxblood);}
+
+  h1,h2,h3{font-family:var(--serif); font-weight:500; color:var(--ink);}
+  .lede{
+    font-size:22px; line-height:1.6; color:#463f34; max-width:640px;
+  }
+
+  /* ---------- progress rail ---------- */
+  #rail{
+    position:fixed; right:28px; top:50%; transform:translateY(-50%);
+    display:flex; flex-direction:column; gap:14px; z-index:50;
+  }
+  #rail button{
+    width:9px; height:9px; border-radius:50%;
+    background:transparent; border:1.5px solid var(--stone);
+    cursor:pointer; padding:0; transition:background .25s, border-color .25s, transform .25s;
+  }
+  #rail button.active{background:var(--oxblood); border-color:var(--oxblood); transform:scale(1.3);}
+  @media (max-width:900px){ #rail{display:none;} }
+
+  /* ---------- hero ---------- */
+  #hero{
+    min-height:100vh; display:flex; flex-direction:column; justify-content:center;
+    background:var(--indigo); color:var(--bone); padding-top:0; padding-bottom:0;
+    position:relative; overflow:hidden;
+  }
+  #hero .hero-bg{
+    position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+    object-position:center 30%; z-index:0; opacity:0.5;
+  }
+  #hero .hero-scrim{
+    position:absolute; inset:0; z-index:1;
+    background:linear-gradient(115deg, rgba(19,30,41,0.97) 0%, rgba(19,30,41,0.93) 38%, rgba(19,30,41,0.55) 72%, rgba(19,30,41,0.75) 100%);
+  }
+  #hero .wrap{width:100%; position:relative; z-index:2;}
+  #hero .eyebrow{
+    font-family:var(--mono); font-size:14px; letter-spacing:0.02em;
+    color:var(--celadon-soft); margin-bottom:36px;
+  }
+  #hero h1{
+    font-size:clamp(40px, 6vw, 72px); line-height:1.12; color:var(--bone);
+    max-width:920px; font-weight:500;
+  }
+  #hero h1 em{font-style:italic; color:var(--oxblood-bright);}
+  #hero .sub{
+    margin-top:32px; font-size:21px; color:#b9c2c9; max-width:600px; line-height:1.6;
+  }
+  #hero .meta{
+    margin-top:64px; display:flex; gap:32px; flex-wrap:wrap;
+    font-family:var(--mono); font-size:14px; color:#7d8993;
+  }
+  #hero .meta span b{color:#b9c2c9; font-weight:500;}
+  .scroll-cue{
+    position:absolute; bottom:40px; left:0; right:0; text-align:center;
+    font-family:var(--mono); font-size:13px; color:#5f6d78;
+  }
+  .scroll-cue .arrow{display:block; margin:10px auto 0; width:1px; height:34px; background:#5f6d78; position:relative; animation:cue 2.2s ease-in-out infinite;}
+  @keyframes cue{ 0%,100%{opacity:.25;} 50%{opacity:1;} }
+
+  /* ---------- observation / timeline ---------- */
+  #observation{background:var(--bone);}
+  .timeline{margin-top:64px;}
+  .curve-wrap{position:relative;}
+  .curve-wrap svg{width:100%; height:auto; display:block;}
+  .era-nodes{
+    display:flex; justify-content:space-between; margin-top:-14px;
+  }
+  .era-node{
+    flex:1; display:flex; flex-direction:column; align-items:center; gap:10px;
+    background:none; border:none; cursor:pointer; font-family:var(--sans);
+    padding:14px 4px; color:var(--stone);
+  }
+  .era-node .dot{width:13px; height:13px; border-radius:50%; background:var(--bone); border:2px solid var(--stone); transition:all .2s;}
+  .era-node .label{font-size:15px; font-weight:500;}
+  .era-node[aria-pressed="true"] .dot{background:var(--oxblood); border-color:var(--oxblood); transform:scale(1.25);}
+  .era-node[aria-pressed="true"] .label{color:var(--oxblood);}
+  .era-node:hover .dot{border-color:var(--oxblood);}
+
+  .era-detail{
+    margin-top:40px; background:#ffffff; border:1px solid var(--line);
+    border-radius:4px; padding:40px 44px; min-height:150px;
+    display:flex; gap:40px; align-items:flex-start; flex-wrap:wrap;
+  }
+  .era-detail .era-text{flex:1; min-width:280px;}
+  .era-detail .era-photo{
+    width:260px; flex-shrink:0; border-radius:3px; overflow:hidden;
+    border:1px solid var(--line);
+  }
+  .era-detail .era-photo img{width:100%; height:320px; object-fit:cover; display:block;}
+  .era-detail .era-photo .cap{
+    font-family:var(--mono); font-size:12px; color:var(--stone);
+    padding:10px 12px; background:#faf7ef;
+  }
+  .era-detail h3{font-size:28px; margin-bottom:14px;}
+  .era-detail p{font-size:18px; line-height:1.65; color:#463f34; max-width:760px;}
+  .era-detail .tag{
+    display:inline-block; font-family:var(--mono); font-size:12px;
+    color:var(--oxblood); border:1px solid var(--oxblood); border-radius:3px;
+    padding:3px 9px; margin-bottom:16px;
+  }
+
+  /* ---------- statement ---------- */
+  .statement{
+    background:var(--indigo); color:var(--bone); text-align:left;
+  }
+  .statement .wrap{max-width:980px;}
+  .statement h2{
+    font-size:clamp(30px, 4.2vw, 50px); line-height:1.42; font-weight:400;
+    color:var(--bone);
+  }
+  .statement h2 .accent{color:var(--oxblood-bright); font-style:italic;}
+
+  /* ---------- literature ---------- */
+  .card-row{display:flex; gap:32px; margin-top:56px; flex-wrap:wrap;}
+  .lit-card{
+    flex:1; min-width:280px; background:#ffffff; border:1px solid var(--line);
+    padding:40px; border-radius:4px;
+  }
+  .lit-card h3{font-size:23px; color:var(--oxblood); margin-bottom:18px; font-weight:500;}
+  .lit-card p{font-size:17px; line-height:1.65; color:#463f34;}
+  .lit-card p + p{margin-top:14px; color:var(--stone); font-size:16px;}
+
+  /* ---------- boat interactive ---------- */
+  #boat{background:var(--bone-soft);}
+  .boat-modes{
+    display:flex; gap:10px; flex-wrap:wrap; margin-top:40px; margin-bottom:52px;
+  }
+  .boat-modes button{
+    font-family:var(--sans); font-size:15px; font-weight:500;
+    padding:11px 20px; border-radius:24px; border:1.5px solid var(--line);
+    background:transparent; color:var(--ink); cursor:pointer;
+    transition:all .2s;
+  }
+  .boat-modes button:hover{border-color:var(--oxblood);}
+  .boat-modes button.active{background:var(--indigo); border-color:var(--indigo); color:var(--bone);}
+
+  .boat-stage{display:flex; gap:56px; align-items:flex-start; flex-wrap:wrap;}
+  .boat-svg-wrap{flex:1; min-width:460px;}
+  .boat-svg-wrap svg{width:100%; height:auto; display:block; overflow:visible;}
+  .boat-node{cursor:pointer;}
+  .boat-node rect{fill:#ffffff; stroke:var(--line); stroke-width:2; transition:stroke .2s, fill .2s;}
+  .boat-node:hover rect, .boat-node.active rect{stroke:var(--oxblood); fill:#fdf6ee;}
+  .boat-node text{font-family:var(--sans); font-size:15px; fill:var(--ink); pointer-events:none;}
+  .boat-node .lvl{font-family:var(--mono); font-size:11px; fill:var(--stone);}
+  .boat-arrow-hit{fill:transparent; cursor:pointer;}
+  .boat-arrow-line{stroke:var(--indigo); stroke-width:2.5; fill:none; marker-end:url(#arrowhead);}
+  .boat-arrow-label{
+    font-family:var(--sans); font-size:13px; font-style:italic; fill:var(--stone);
+    pointer-events:none;
+  }
+  .boat-arrow-hit:hover ~ .boat-arrow-line, .boat-arrow-hit.active ~ .boat-arrow-line{stroke:var(--oxblood);}
+
+  .boat-panel{
+    flex:1; min-width:320px; background:#ffffff; border:1px solid var(--line);
+    border-radius:4px; padding:40px; min-height:280px;
+  }
+  .boat-panel .tag{
+    font-family:var(--mono); font-size:12px; color:var(--oxblood);
+    text-transform:none; margin-bottom:16px; display:block;
+  }
+  .boat-panel h3{font-size:26px; margin-bottom:16px;}
+  .boat-panel p{font-size:18px; line-height:1.65; color:#463f34;}
+  .boat-hint{font-size:15px; color:var(--stone); margin-top:24px; font-style:italic;}
+
+  /* ---------- loss aversion ---------- */
+  #loss{background:var(--bone);}
+  .scale-demo{
+    margin-top:56px; background:#ffffff; border:1px solid var(--line); border-radius:4px;
+    padding:48px; display:flex; gap:48px; align-items:center; flex-wrap:wrap;
+  }
+  .scale-toggle{
+    display:flex; flex-direction:column; gap:14px; min-width:220px;
+  }
+  .scale-toggle button{
+    font-family:var(--sans); font-size:16px; font-weight:500; text-align:left;
+    padding:16px 20px; border-radius:4px; border:1.5px solid var(--line);
+    background:transparent; cursor:pointer; transition:all .2s; color:var(--ink);
+  }
+  .scale-toggle button.active{border-color:var(--oxblood); background:#fdf6ee; color:var(--oxblood);}
+  .scale-visual{flex:1; min-width:280px;}
+  .scale-visual svg{width:100%; height:auto; display:block;}
+  .scale-readout{margin-top:18px; font-size:17px; color:#463f34; line-height:1.6;}
+
+  /* ---------- cases tabs ---------- */
+  #cases{background:var(--bone-soft);}
+  .tabs{display:flex; gap:8px; margin-top:48px; border-bottom:1px solid var(--line); flex-wrap:wrap;}
+  .tab-btn{
+    font-family:var(--sans); font-size:17px; font-weight:500; color:var(--stone);
+    background:none; border:none; padding:16px 6px; margin-right:28px; cursor:pointer;
+    position:relative; top:1px;
+  }
+  .tab-btn.active{color:var(--oxblood); border-bottom:2.5px solid var(--oxblood);}
+  .tab-panel{display:none; padding-top:48px;}
+  .tab-panel.active{display:block;}
+  .tab-panel .source{font-family:var(--mono); font-size:13px; color:var(--oxblood); margin-bottom:18px; display:block;}
+  .tab-panel > p{font-size:19px; line-height:1.7; color:#463f34; max-width:760px; margin-bottom:36px;}
+  .bam{display:flex; gap:24px; flex-wrap:wrap; margin-bottom:32px;}
+  .bam > div{
+    flex:1; min-width:200px; background:#ffffff; border:1px solid var(--line);
+    border-radius:4px; padding:26px 28px;
+  }
+  .bam h4{font-family:var(--mono); font-size:12px; color:var(--stone); margin-bottom:10px; font-weight:500;}
+  .bam p{font-size:16px; line-height:1.5; color:var(--ink);}
+  .callout{
+    background:var(--indigo); color:var(--bone); border-radius:4px;
+    padding:32px 36px; font-size:17px; line-height:1.65;
+  }
+  .callout b{color:var(--oxblood-bright);}
+
+  /* ---------- competing ---------- */
+  .compare{display:flex; gap:0; margin-top:52px; border:1px solid var(--line); border-radius:4px; overflow:hidden; flex-wrap:wrap;}
+  .compare > div{flex:1; min-width:280px; padding:40px;}
+  .compare > div:first-child{background:#ffffff; border-right:1px solid var(--line);}
+  .compare > div:last-child{background:#fbf7ee;}
+  .compare h4{font-family:var(--mono); font-size:13px; color:var(--oxblood); margin-bottom:16px;}
+  .compare p{font-size:17px; line-height:1.6; color:#463f34;}
+
+  /* ---------- conclusion ---------- */
+  #conclusion{background:var(--indigo-deep); color:var(--bone);}
+  #conclusion .wrap{max-width:920px;}
+  #conclusion .lede{color:#b9c2c9; font-size:22px; max-width:760px;}
+  #conclusion h2{font-size:clamp(28px,3.8vw,42px); line-height:1.5; font-weight:400; margin-top:28px; color:var(--bone);}
+
+  footer{
+    background:var(--indigo-deep); color:#6a7580; text-align:left;
+    padding:56px 0 72px; font-family:var(--mono); font-size:13px;
+  }
+  footer .wrap{display:flex; justify-content:space-between; flex-wrap:wrap; gap:16px;}
+
+  .vessel{position:absolute; opacity:.5;}
+</style>
+</head>
+<body>
+
+<nav id="rail" aria-label="Section progress"></nav>
+
+<!-- ================= HERO ================= -->
+<section id="hero">
+  <img class="hero-bg" src="images/hero.jpg" alt="A large enamel-painted Qing dynasty porcelain vase with a landscape and figure scene, photographed at the China Ceramics Museum, Jingdezhen">
+  <div class="hero-scrim"></div>
+  <div class="wrap">
+    <p class="eyebrow">A sociology of standardization</p>
+    <h1>Standardization does not kill creativity.<br>It <em>redefines</em> what "good" is allowed to mean.</h1>
+    <p class="sub">From Jingdezhen porcelain to fast food, corporate R&amp;D, and popular music — one mechanism, four domains.</p>
+    <div class="meta">
+      <span><b>Shen, Xiayi</b></span>
+      <span>SOC611</span>
+      <span>[Instructor's Name]</span>
+      <span>[Date]</span>
+    </div>
+  </div>
+  <div class="scroll-cue">Scroll<span class="arrow"></span></div>
+</section>
+
+<!-- ================= OBSERVATION ================= -->
+<section id="observation">
+  <div class="wrap">
+    <p class="kicker">01 — The observation</p>
+    <h2 style="font-size:clamp(28px,4vw,44px); max-width:760px;">An afternoon at the China Ceramics Museum, in Jingdezhen</h2>
+    <p class="lede" style="margin-top:24px;">The galleries move chronologically. Sophistication climbs for a thousand years — then, in the twentieth century, it flattens. Click an era below.</p>
+
+    <div class="timeline">
+      <div class="curve-wrap">
+        <svg viewBox="0 0 980 220" preserveAspectRatio="none" aria-hidden="true">
+          <polyline points="20,190 160,160 300,120 440,80 580,35 720,175 860,200"
+            fill="none" stroke="#c9bd9c" stroke-width="2" stroke-dasharray="1 0"/>
+        </svg>
+      </div>
+      <div class="era-nodes" role="group" aria-label="Select a dynasty">
+        <button class="era-node" data-era="tang" aria-pressed="false"><span class="dot"></span><span class="label">Tang</span></button>
+        <button class="era-node" data-era="song" aria-pressed="false"><span class="dot"></span><span class="label">Song</span></button>
+        <button class="era-node" data-era="yuan" aria-pressed="false"><span class="dot"></span><span class="label">Yuan</span></button>
+        <button class="era-node" data-era="ming" aria-pressed="false"><span class="dot"></span><span class="label">Ming</span></button>
+        <button class="era-node" data-era="qing" aria-pressed="false"><span class="dot"></span><span class="label">Qing</span></button>
+        <button class="era-node" data-era="republic" aria-pressed="false"><span class="dot"></span><span class="label">Republic</span></button>
+        <button class="era-node" data-era="prc" aria-pressed="false"><span class="dot"></span><span class="label">PRC</span></button>
+      </div>
+
+      <div class="era-detail" id="era-detail">
+        <span class="tag">Song dynasty</span>
+        <h3>Taxed by kiln volume, paid in advance</h3>
+        <p>Burial figurines rendered with startling individuality. To offset a tax charged regardless of yield, potters invented the <i>fu shao</i> technique — stacking pieces rim-to-rim to raise kiln yield. Scarcity forced invention.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ARGUMENT ================= -->
+<section class="statement">
+  <div class="wrap">
+    <p class="kicker" style="color:var(--celadon-soft);">02 — The argument</p>
+    <h2>Standardization does not simply lower quality. It privileges the kind of creativity that improves along dimensions a system already knows how to measure — <span class="accent">and starves the kind that does not.</span></h2>
+  </div>
+</section>
+
+<!-- ================= LITERATURE ================= -->
+<section id="literature">
+  <div class="wrap">
+    <p class="kicker">03 — Situating the claim</p>
+    <h2 style="font-size:clamp(28px,4vw,44px); max-width:760px;">Two sociologists already pointed here</h2>
+    <div class="card-row">
+      <div class="lit-card">
+        <h3>Godart, Seong &amp; Phillips (2020)</h3>
+        <p>Creativity is an intentional configuration of material and cultural elements that is <i>unexpected for a given audience</i> — shaped by structure, institutions, and context.</p>
+        <p>This paper sits on the antecedent side: what structure makes the configuring behavior happen at all.</p>
+      </div>
+      <div class="lit-card">
+        <h3>Bourdieu (1993)</h3>
+        <p>A field's "restricted" pole answers to peer judgment; its "large-scale" pole answers to standardized production for a pre-existing, measured demand.</p>
+        <p>Each domain below instantiates that distinction in a different institutional form.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= COLEMAN'S BOAT ================= -->
+<section id="boat">
+  <div class="wrap">
+    <p class="kicker">04 — The tool</p>
+    <h2 style="font-size:clamp(28px,4vw,44px); max-width:820px;">Coleman's Boat: one macro&ndash;micro&ndash;macro structure, five domains</h2>
+    <p class="lede" style="margin-top:20px;">Switch domains below. The diagram and the explanation update together — the shape never changes, only what fills it.</p>
+
+    <div class="boat-modes" role="group" aria-label="Choose a domain">
+      <button data-mode="general" class="active">The general tool</button>
+      <button data-mode="tangqing">Tang&ndash;Qing Jingdezhen</button>
+      <button data-mode="prc">Republican&ndash;PRC Jingdezhen</button>
+      <button data-mode="food">Fast food</button>
+      <button data-mode="rd">Corporate R&amp;D</button>
+      <button data-mode="music">Popular music</button>
+    </div>
+
+    <div class="boat-stage">
+      <div class="boat-svg-wrap">
+        <svg viewBox="0 0 640 420" aria-label="Interactive Coleman's Boat diagram">
+          <defs>
+            <marker id="arrowhead" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto">
+              <path d="M0,0 L8,4 L0,8 Z" fill="var(--indigo)"></path>
+            </marker>
+          </defs>
+
+          <!-- axis labels -->
+          <text x="14" y="70" class="boat-arrow-label" transform="rotate(-90 14 70)" text-anchor="middle" style="font-family:var(--mono); font-size:11px;">MACRO</text>
+          <text x="14" y="300" class="boat-arrow-label" transform="rotate(-90 14 300)" text-anchor="middle" style="font-family:var(--mono); font-size:11px;">MICRO</text>
+
+          <!-- arrow lines (drawn first, under nodes) -->
+          <path class="boat-arrow-line" d="M120,90 L210,260"></path>
+          <path class="boat-arrow-line" d="M270,290 L370,290"></path>
+          <path class="boat-arrow-line" d="M430,260 L520,90"></path>
+
+          <!-- arrow hit areas + labels -->
+          <g data-arrow="situational">
+            <rect class="boat-arrow-hit" x="95" y="120" width="120" height="110"></rect>
+            <text x="70" y="175" class="boat-arrow-label" text-anchor="middle">situational</text>
+            <text x="70" y="192" class="boat-arrow-label" text-anchor="middle">mechanism</text>
+          </g>
+          <g data-arrow="action">
+            <rect class="boat-arrow-hit" x="270" y="255" width="100" height="60"></rect>
+            <text x="320" y="330" class="boat-arrow-label" text-anchor="middle">action-formation</text>
+            <text x="320" y="347" class="boat-arrow-label" text-anchor="middle">mechanism</text>
+          </g>
+          <g data-arrow="transformational">
+            <rect class="boat-arrow-hit" x="425" y="120" width="120" height="110"></rect>
+            <text x="570" y="175" class="boat-arrow-label" text-anchor="middle">transformational</text>
+            <text x="570" y="192" class="boat-arrow-label" text-anchor="middle">mechanism</text>
+          </g>
+
+          <!-- corner nodes -->
+          <g class="boat-node" data-node="tl">
+            <rect x="20" y="30" width="200" height="66" rx="4"></rect>
+            <text x="120" y="56" text-anchor="middle" class="lvl">MACRO CONDITION</text>
+            <text x="120" y="78" text-anchor="middle" data-field="tl">Macro condition</text>
+          </g>
+          <g class="boat-node" data-node="tr">
+            <rect x="420" y="30" width="200" height="66" rx="4"></rect>
+            <text x="520" y="56" text-anchor="middle" class="lvl">MACRO OUTCOME</text>
+            <text x="520" y="78" text-anchor="middle" data-field="tr">Macro outcome</text>
+          </g>
+          <g class="boat-node" data-node="bl">
+            <rect x="120" y="262" width="200" height="66" rx="4"></rect>
+            <text x="220" y="288" text-anchor="middle" class="lvl">INDIVIDUAL BELIEF</text>
+            <text x="220" y="310" text-anchor="middle" data-field="bl">Individual belief</text>
+          </g>
+          <g class="boat-node" data-node="br">
+            <rect x="320" y="262" width="200" height="66" rx="4"></rect>
+            <text x="420" y="288" text-anchor="middle" class="lvl">INDIVIDUAL ACTION</text>
+            <text x="420" y="310" text-anchor="middle" data-field="br">Individual action</text>
+          </g>
+        </svg>
+      </div>
+
+      <div class="boat-panel">
+        <span class="tag" id="panel-source">Coleman (1990)</span>
+        <h3 id="panel-title">Coleman's Boat</h3>
+        <p id="panel-body">A macro condition shapes what individuals believe is rational to want; belief converts into a concrete action; the aggregation of many individuals' actions produces the macro-level outcome.</p>
+        <p class="boat-hint" id="panel-hint">Click a corner or an arrow in the diagram for more detail.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= LOSS AVERSION ================= -->
+<section id="loss">
+  <div class="wrap">
+    <p class="kicker">05 — Why it holds</p>
+    <h2 style="font-size:clamp(28px,4vw,44px); max-width:800px;">The same psychology drives opposite actions</h2>
+    <p class="lede" style="margin-top:20px;">Kahneman &amp; Tversky (1979): losses are weighted roughly 2&ndash;2.5&times; more heavily than equivalent gains. Toggle the frame below.</p>
+
+    <div class="scale-demo">
+      <div class="scale-toggle" role="group" aria-label="Choose a loss frame">
+        <button data-frame="subsistence" class="active">Loss = falling below subsistence</button>
+        <button data-frame="exclusion">Loss = exclusion, defunding, demotion</button>
+      </div>
+      <div class="scale-visual">
+        <svg viewBox="0 0 460 140" id="scale-svg" aria-hidden="true">
+          <line x1="230" y1="20" x2="230" y2="110" stroke="var(--stone)" stroke-width="3"></line>
+          <line id="beam" x1="90" y1="40" x2="370" y2="40" stroke="var(--ink)" stroke-width="4" style="transform-origin:230px 40px; transition:transform .4s ease;"></line>
+          <circle id="ball-left" cx="90" cy="46" r="16" fill="var(--oxblood)"></circle>
+          <circle id="ball-right" cx="370" cy="46" r="16" fill="var(--celadon)"></circle>
+          <text x="90" y="90" text-anchor="middle" font-family="IBM Plex Mono" font-size="12" fill="#463f34">risk-seeking</text>
+          <text x="370" y="90" text-anchor="middle" font-family="IBM Plex Mono" font-size="12" fill="#463f34">risk-averse</text>
+        </svg>
+        <p class="scale-readout" id="scale-readout">Tang-era taxation framed subsistence as the loss at stake. Only innovation avoided it — the risk-seeking choice tips the scale.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CASES ================= -->
+<section id="cases">
+  <div class="wrap">
+    <p class="kicker">06 — Three domains</p>
+    <h2 style="font-size:clamp(28px,4vw,44px); max-width:760px;">Testing the mechanism for generality</h2>
+
+    <div class="tabs" role="tablist" aria-label="Case studies">
+      <button class="tab-btn active" data-tab="food" role="tab" aria-selected="true">Fast food</button>
+      <button class="tab-btn" data-tab="rd" role="tab" aria-selected="false">Corporate R&amp;D</button>
+      <button class="tab-btn" data-tab="music" role="tab" aria-selected="false">Popular music</button>
+    </div>
+
+    <div class="tab-panel active" id="tab-food" role="tabpanel">
+      <span class="source">Ritzer (1993)</span>
+      <p>1967: Ray Kroc replaces McDonald's fresh, regionally sourced potatoes &mdash; from roughly 175 suppliers &mdash; with a single frozen product engineered by J.R. Simplot: fixed solids content, a "potato computer" timing every fry by oil temperature.</p>
+      <div class="bam">
+        <div><h4>BELIEF</h4><p>Consistency lowers risk; judgment introduces variance</p></div>
+        <div><h4>ACTION</h4><p>Adopt computer-timed, pre-processed inputs</p></div>
+        <div><h4>OUTCOME</h4><p>A globally uniform product &mdash; "McDonaldization"</p></div>
+      </div>
+      <div class="callout">Ritzer's <b>"irrationality of rationality"</b>: perfectly rational within the supply chain's own logic of cost and consistency, yet a narrowing of what "good" is allowed to mean by any older standard.</div>
+    </div>
+
+    <div class="tab-panel" id="tab-rd" role="tabpanel">
+      <span class="source">Christensen (1997)</span>
+      <p>Sustaining innovation is measurable, so KPI-driven organizations fund it. Disruptive innovation looks worse on existing metrics &mdash; and gets starved. The 1975&ndash;1994 disk-drive industry shows this at every size transition; flash memory relived it against the hard drive decades later.</p>
+      <div class="bam">
+        <div><h4>BELIEF</h4><p>Sustaining, measurable proposals are the safe ones to fund</p></div>
+        <div><h4>ACTION</h4><p>Resources concentrate on sustaining innovation</p></div>
+        <div><h4>OUTCOME</h4><p>Incumbents displaced by entrants they never funded</p></div>
+      </div>
+      <div class="callout">A more direct test: Yahoo could have bought <b>Google</b> (1998, ~$1M; 2002, ~$3&ndash;5B) and <b>Facebook</b> (2006, ~$1B). Every deal fell through. Kamepalli, Rajan &amp; Zingales (2020): today's platforms no longer need to close the deal &mdash; the mere anticipation of acquisition creates a <b>"kill zone"</b> that depresses funding before an entrant is large enough to negotiate as an equal.</div>
+    </div>
+
+    <div class="tab-panel" id="tab-music" role="tabpanel">
+      <span class="source">Serr&agrave; et al. (2012) &middot; Mauch et al. (2015)</span>
+      <p>1991: Nielsen SoundScan replaces subjective chart reporting with point-of-sale data. From 2007, streaming and skip-rate data are folded in. Success shifts from a deliberate purchase to a continuously logged engagement signal.</p>
+      <div class="bam">
+        <div><h4>BELIEF</h4><p>A listener not seized in seconds will skip</p></div>
+        <div><h4>ACTION</h4><p>Compress intros, simplify harmony, front-load the hook</p></div>
+        <div><h4>OUTCOME</h4><p>A more homogeneous musical landscape</p></div>
+      </div>
+      <div class="callout">L&eacute;veill&eacute; Gauvin (2018): average song intros fell from <b>~22&ndash;23s to ~5s</b> between 1986 and 2015. But the homogenizing pressure predates streaming &mdash; Serr&agrave; et al. found it already underway in 464,411 recordings from 1955&ndash;2010, entirely within the purchase-era charts.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= COMPETING ================= -->
+<section id="competing">
+  <div class="wrap">
+    <p class="kicker">07 — A competing account</p>
+    <h2 style="font-size:clamp(28px,4vw,44px); max-width:780px;">It might not be incentives. It might be network structure.</h2>
+    <p class="lede" style="margin-top:20px;">Burt (2004): brokers spanning "structural holes" generate more novel ideas. Uzzi &amp; Spiro (2005): Broadway's most creative periods matched a "small-world" balance of tightly and loosely connected collaborators.</p>
+
+    <div class="compare">
+      <div>
+        <h4>THIS PAPER'S MECHANISM</h4>
+        <p>Creativity falls wherever measurable incentives penalize deviation &mdash; regardless of network structure.</p>
+      </div>
+      <div>
+        <h4>THE NETWORK ACCOUNT</h4>
+        <p>Creativity falls specifically where standardization reduces structural diversity &mdash; incentives held constant.</p>
+      </div>
+    </div>
+    <p style="margin-top:28px; color:var(--stone); font-size:16px;">Adjudicating between them needs network and longitudinal data beyond this paper's scope.</p>
+  </div>
+</section>
+
+<!-- ================= CONCLUSION ================= -->
+<section id="conclusion">
+  <div class="wrap">
+    <p class="kicker" style="color:var(--celadon-soft);">08 — Conclusion</p>
+    <p class="lede">What disappeared in Jingdezhen's later galleries was not standardization's arrival &mdash; the kilns had lived inside standardizing pressure for a millennium.</p>
+    <h2>It was standardization's <em style="font-style:italic; color:var(--oxblood-bright);">character</em>: a shift from a standardization that still had to answer to competition, taxation, and craft judgment, to one that answered only to itself.</h2>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>Standardization and the Redefinition of "Good"</span>
+    <span>Built with Coleman's Boat (Coleman, 1990)</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------------- section rail ---------------- */
+  var sections = Array.prototype.slice.call(document.querySelectorAll("section"));
+  var rail = document.getElementById("rail");
+  sections.forEach(function(s, i){
+    var b = document.createElement("button");
+    b.setAttribute("aria-label", s.id || ("section " + (i+1)));
+    b.addEventListener("click", function(){ s.scrollIntoView({behavior:"smooth"}); });
+    rail.appendChild(b);
+  });
+  var railBtns = Array.prototype.slice.call(rail.children);
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      var idx = sections.indexOf(e.target);
+      if(e.isIntersecting){
+        railBtns.forEach(function(b){ b.classList.remove("active"); });
+        if(railBtns[idx]) railBtns[idx].classList.add("active");
+      }
+    });
+  }, {threshold:0.5});
+  sections.forEach(function(s){ io.observe(s); });
+
+  /* ---------------- era timeline ---------------- */
+  var eraData = {
+    tang: {tag:"Tang dynasty", title:"Simple forms, before any tax regime", body:"Ceramics still in their formative stage, produced before any standardized tax regime existed — though Jingdezhen's white porcelain had already begun to travel widely."},
+    song: {tag:"Song dynasty", title:"Taxed by kiln volume, paid in advance", body:"Burial figurines rendered with startling individuality. To offset a tax charged regardless of yield, potters invented the fu shao technique — stacking pieces rim-to-rim to raise kiln yield. Scarcity forced invention.", photo:"images/song-figurines.jpg", cap:"Porcelain figurines (瓷俑), Song dynasty — photographed at the China Ceramics Museum, Jingdezhen"},
+    yuan: {tag:"Yuan dynasty", title:"A two-tiered tax, and a new palette", body:"A production tax at the kiln, a transit tax at every checkpoint. Under Mongol rule, a taste for vivid color entered the vocabulary — producing the notoriously difficult copper-red glazes.", photo:"images/yuan-blue-white.jpg", cap:"Blue-and-white vase with stand, Yuan dynasty — China Ceramics Museum, Jingdezhen"},
+    ming: {tag:"Ming dynasty", title:"Decoration turns narrative", body:"Artisans began painting entire stories onto porcelain, compressing a whole visual narrative onto a single vessel's surface. This copper-red glazed bowl, from the Yongle reign, shows the technical difficulty the era had already mastered.", photo:"images/ming-copper-red.jpg", cap:"Red-glaze bowl (红釉钵), Yongle period, Ming dynasty — China Ceramics Museum, Jingdezhen"},
+    qing: {tag:"Qing dynasty", title:"A dual-track system, competing and learning", body:"Official kilns drove technical innovation through exacting quality standards; private kilns supplied volume for domestic and international markets. This Kangxi-period plate depicts a scene from a popular drama, painted directly onto the glaze.", photo:"images/qing-narrative.jpg", cap:"Underglaze-red narrative plate, Kangxi period, Qing dynasty — China Ceramics Museum, Jingdezhen"},
+    republic: {tag:"Republican era", title:"Porcelain reverts to plain white", body:"The arc of escalating sophistication breaks. Porcelain reverts to plain white, re-treading older designs rather than advancing them."},
+    prc: {tag:"People's Republic", title:"Standardization answers only to itself", body:"Colors flatten into a narrow palette, decoration looks printed rather than painted, subject matter repeats the same themes with little variation."}
+  };
+  var eraNodes = document.querySelectorAll(".era-node");
+  var eraDetail = document.getElementById("era-detail");
+  function setEra(key){
+    eraNodes.forEach(function(n){ n.setAttribute("aria-pressed", n.dataset.era === key ? "true" : "false"); });
+    var d = eraData[key];
+    var photoHtml = d.photo
+      ? '<div class="era-photo"><img src="' + d.photo + '" alt="' + d.cap + '"><div class="cap">' + d.cap + '</div></div>'
+      : '';
+    eraDetail.innerHTML = photoHtml + '<div class="era-text"><span class="tag">' + d.tag + '</span><h3>' + d.title + '</h3><p>' + d.body + '</p></div>';
+  }
+  eraNodes.forEach(function(n){
+    n.addEventListener("click", function(){ setEra(n.dataset.era); });
+  });
+  setEra("song");
+
+  /* ---------------- Coleman's Boat ---------------- */
+  var boatData = {
+    general: {
+      source:"Coleman (1990)", title:"Coleman's Boat",
+      tl:"Macro condition", tr:"Macro outcome", bl:"Individual belief", br:"Individual action",
+      situational:"A macro condition shapes what individuals believe is rational to want.",
+      action:"That belief is converted into a concrete action.",
+      transformational:"The aggregation of many individuals' actions produces the macro-level outcome.",
+      body:"A macro condition shapes what individuals believe is rational to want; belief converts into a concrete action; the aggregation of many individuals' actions produces the macro-level outcome."
+    },
+    tangqing: {
+      source:"Tang\u2013Qing Jingdezhen", title:"Taxation, and the era it produced",
+      tl:"Kiln-volume taxation", tr:"Era of sustained innovation",
+      bl:"Perceived necessity of a competitive edge", br:"Firing, glaze &amp; design innovation",
+      situational:"A volume-based tax makes an innovative edge the only reliable margin.",
+      action:"Potters pursuing that margin experiment with technique and design.",
+      transformational:"Many potters' innovations aggregate into an era-wide advance.",
+      body:"A tax charged by kiln volume, paid in advance of firing, made only a technical or creative edge leave a margin large enough to support a household — turning scarcity into invention."
+    },
+    prc: {
+      source:"Republican\u2013PRC Jingdezhen", title:"Conformity, and the flatness it produced",
+      tl:"Collectivized, conformity-enforcing production", tr:"Standardized, undifferentiated output",
+      bl:"Perceived risk of individual distinctiveness", br:"Conformity to sanctioned forms",
+      situational:"A political culture treating distinctiveness as deviance makes conformity safer.",
+      action:"Avoiding that risk, potters reproduce approved forms and suppress style.",
+      transformational:"Widespread conformity aggregates into flattened, uniform output.",
+      body:"Not the mere absence of tax pressure — a different macro condition entirely: collectivized production inside a political culture where standing out could be, and periodically was, reinterpreted as ideological deviance."
+    },
+    food: {
+      source:"Fast food \u00b7 Ritzer (1993)", title:"The supply chain that ate variance",
+      tl:"Standardized, factory-processed supply chain", tr:"Globally uniform product",
+      bl:"Consistency lowers risk; judgment introduces variance", br:"Adopt computer-timed, pre-processed inputs",
+      situational:"A supply chain that requires predictable inputs makes judgment a liability.",
+      action:"Franchisees and cooks adopt standardized process wholesale.",
+      transformational:"A product that tastes the same everywhere it is sold.",
+      body:"1967: McDonald's replaces regionally variable potatoes with a single frozen product, specified down to solids content and fry time. Ritzer's McDonaldization, in miniature."
+    },
+    rd: {
+      source:"Corporate R&amp;D \u00b7 Christensen (1997)", title:"The KPI that can't see what it hasn't measured",
+      tl:"KPI-driven, bureaucratic resource allocation", tr:"Incumbents displaced by entrants they never funded",
+      bl:"Sustaining, measurable proposals are the safe ones to fund", br:"Resources concentrate on sustaining innovation",
+      situational:"A resource-allocation process cannot yet fund what it hasn't been asked to measure.",
+      action:"Engineers and managers champion proposals tied to current, measurable customer demand.",
+      transformational:"Each incumbent is eventually displaced by an entrant it never funded.",
+      body:"The 1975\u20131994 disk-drive industry, relived by flash memory against the hard drive: sustaining innovation gets funded; disruptive innovation looks worse on today's metrics, and starves."
+    },
+    music: {
+      source:"Popular music \u00b7 Serr\u00e0 et al. (2012)", title:"When the skip becomes the metric",
+      tl:"Success measured by continuous engagement data", tr:"A more homogeneous musical landscape",
+      bl:"A listener not seized in seconds will skip", br:"Compress intros, simplify harmony, front-load the hook",
+      situational:"Skip-rate data makes the first few seconds the only ones that count.",
+      action:"Producers compress intros and front-load hooks to hold attention.",
+      transformational:"Aggregate output narrows toward a smaller set of proven formulas.",
+      body:"Average song intros fell from ~22\u201323s to ~5s (1986\u20132015). But the homogenizing pressure predates streaming \u2014 already visible in purchase-era charts back to 1955."
+    }
+  };
+
+  var boatBtns = document.querySelectorAll(".boat-modes button");
+  var svgNodes = document.querySelectorAll(".boat-node");
+  var svgArrows = document.querySelectorAll("[data-arrow]");
+  var panelSource = document.getElementById("panel-source");
+  var panelTitle = document.getElementById("panel-title");
+  var panelBody = document.getElementById("panel-body");
+  var panelHint = document.getElementById("panel-hint");
+
+  function paintMode(key){
+    var d = boatData[key];
+    document.querySelector('[data-field="tl"]').textContent = wrapField(d.tl);
+    document.querySelector('[data-field="tr"]').textContent = wrapField(d.tr);
+    document.querySelector('[data-field="bl"]').textContent = wrapField(d.bl);
+    document.querySelector('[data-field="br"]').textContent = wrapField(d.br);
+    panelSource.textContent = d.source.replace(/&amp;/g,"&");
+    panelTitle.textContent = d.title.replace(/&amp;/g,"&");
+    panelBody.textContent = d.body;
+    panelHint.textContent = "Click a corner or an arrow in the diagram for more detail.";
+    svgNodes.forEach(function(n){ n.classList.remove("active"); });
+    svgArrows.forEach(function(a){ a.querySelector("rect").classList.remove("active"); });
+  }
+  function wrapField(text){
+    // keep SVG text short; full text lives in the panel
+    return text.length > 30 ? text.slice(0,28) + "\u2026" : text;
+  }
+
+  boatBtns.forEach(function(btn){
+    btn.addEventListener("click", function(){
+      boatBtns.forEach(function(b){ b.classList.remove("active"); });
+      btn.classList.add("active");
+      paintMode(btn.dataset.mode);
+    });
+  });
+
+  var currentMode = "general";
+  boatBtns[0].addEventListener("click", function(){ currentMode = "general"; });
+
+  svgNodes.forEach(function(n){
+    n.addEventListener("click", function(){
+      var mode = document.querySelector(".boat-modes button.active").dataset.mode;
+      var d = boatData[mode];
+      var field = n.dataset.node;
+      svgNodes.forEach(function(x){ x.classList.remove("active"); });
+      n.classList.add("active");
+      panelSource.textContent = d.source.replace(/&amp;/g,"&");
+      panelTitle.textContent = d[field].replace(/&amp;/g,"&");
+      panelBody.textContent = ({
+        tl:"This is the macro-level condition: the institutional pressure that starts the chain.",
+        tr:"This is the macro-level outcome: the social phenomenon this paper sets out to explain.",
+        bl:"This is the individual-level belief: what the macro condition makes it locally rational to want.",
+        br:"This is the individual-level action: what that belief leads a person to actually do."
+      })[field];
+      panelHint.textContent = "Click " + (field==="tl"||field==="tr"?"an arrow":"another corner") + " to keep exploring, or switch domains above.";
+    });
+  });
+
+  svgArrows.forEach(function(g){
+    g.addEventListener("click", function(){
+      var mode = document.querySelector(".boat-modes button.active").dataset.mode;
+      var d = boatData[mode];
+      var kind = g.dataset.arrow;
+      svgArrows.forEach(function(x){ x.querySelector("rect").classList.remove("active"); });
+      g.querySelector("rect").classList.add("active");
+      svgNodes.forEach(function(x){ x.classList.remove("active"); });
+      var names = {situational:"Situational mechanism", action:"Action-formation mechanism", transformational:"Transformational mechanism"};
+      panelSource.textContent = d.source.replace(/&amp;/g,"&");
+      panelTitle.textContent = names[kind];
+      panelBody.textContent = d[kind];
+      panelHint.textContent = "Click a corner to see what it connects, or switch domains above.";
+    });
+  });
+
+  paintMode("general");
+
+  /* ---------------- loss aversion scale ---------------- */
+  var frameData = {
+    subsistence: {rot:-10, text:"Tang-era taxation framed subsistence as the loss at stake. Only innovation avoided it \u2014 the risk-seeking choice tips the scale."},
+    exclusion: {rot:10, text:"PRC conformity, KPI process, and skip-rate algorithms frame exclusion as the loss at stake. Only conformity avoids it \u2014 the risk-averse choice tips the scale the other way."}
+  };
+  var beam = document.getElementById("beam");
+  var readout = document.getElementById("scale-readout");
+  var frameBtns = document.querySelectorAll(".scale-toggle button");
+  frameBtns.forEach(function(btn){
+    btn.addEventListener("click", function(){
+      frameBtns.forEach(function(b){ b.classList.remove("active"); });
+      btn.classList.add("active");
+      var d = frameData[btn.dataset.frame];
+      beam.style.transform = "rotate(" + d.rot + "deg)";
+      readout.textContent = d.text;
+    });
+  });
+
+  /* ---------------- case tabs ---------------- */
+  var tabBtns = document.querySelectorAll(".tab-btn");
+  var tabPanels = document.querySelectorAll(".tab-panel");
+  tabBtns.forEach(function(btn){
+    btn.addEventListener("click", function(){
+      tabBtns.forEach(function(b){ b.classList.remove("active"); b.setAttribute("aria-selected","false"); });
+      tabPanels.forEach(function(p){ p.classList.remove("active"); });
+      btn.classList.add("active");
+      btn.setAttribute("aria-selected","true");
+      document.getElementById("tab-" + btn.dataset.tab).classList.add("active");
+    });
+  });
+
+})();
+</script>
+</body>
+</html>
